@@ -1,0 +1,45 @@
+{% load static %}
+<link rel="stylesheet" href="{% static "css/leaflet.css" %} " />
+<link rel="stylesheet" href="{% static "css/MarkerCluster.css" %} " />
+<link rel="stylesheet" href="{% static "css/MarkerCluster.Default.css" %} " />
+<script src="{% static "js/leaflet.js" %}"></script>
+<script src="{% static "js/map.js" %}"></script>
+<script src="{% static "js/leaflet.markercluster-src.js" %}"></script>
+<script src="{% static "js/leaflet.markercluster.js" %}"></script>
+<a href="/" style="text-decoration:none;"><h1>Список всех происшествий</h1></a>
+<ul>
+<div id="map" style="width: 50%; height: 50%; margin: 0 auto;"></div>
+<form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="Сохранить" value="Сохранить">Сохранить</button>
+</form>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+            map = L.map('map').setView([55.760748705787165, 37.626156387675145],10);
+                var baseMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution:  ''
+                                    }).addTo(map);
+
+                var railwayLayer = L.tileLayer('http://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
+                            attribution:  '©OpenRailwayMap'
+                                    }).addTo(map);
+           var featureGroup = L.featureGroup([railwayLayer, baseMap]);
+           featureGroup.addTo(map);
+           L.control.scale().addTo(map);
+             var marker = {};
+                    map.on('click', function(e)
+         {
+                 if (marker != undefined) {
+                    map.removeLayer(marker);
+                 };
+               marker = L.marker(e.latlng).addTo(map).on('click', e => e.target.remove());
+               var latHtml = document.getElementById('id_latitude');
+               latHtml.value = e.latlng.lat;
+               var lonHtml = document.getElementById('id_longitude');
+               lonHtml.value = e.latlng.lng;
+         });
+    });
+
+
+</script>

@@ -1,0 +1,49 @@
+{% load static %}
+<link rel="stylesheet" href="{% static "css/leaflet.css" %} " />
+<link rel="stylesheet" href="{% static "css/MarkerCluster.css" %} " />
+<link rel="stylesheet" href="{% static "css/MarkerCluster.Default.css" %} " />
+<script src="{% static "js/leaflet.js" %}"></script>
+<script src="{% static "js/map.js" %}"></script>
+<script src="{% static "js/leaflet.markercluster-src.js" %}"></script>
+<script src="{% static "js/leaflet.markercluster.js" %}"></script>
+<a href="/" style="text-decoration:none;"><h1>Список всех происшествий</h1></a>
+<ul>
+    <h3>Происшествие № {{ object.pk }}</h3>
+    Адрес - {{ object.address }}
+    Описание - {{ object.description }}
+    Долгота - {{ object.latitude }}
+    Широта - {{ object.longitude }}
+    Меры по ликвидации - {{ object.taken_measures }}
+</ul>
+
+<div id="map" style="width: 50%; height: 50%; margin: 0 auto;"></div>
+<div style="display: none" id="jsonData" data-json="{{ data }}"></div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+            var jsonData = JSON.parse(document.querySelector('#jsonData').getAttribute('data-json'));
+            console.log(jsonData);
+            console.log(jsonData.length);
+            map = L.map('map').setView([55.760748705787165, 37.626156387675145],10);
+                var baseMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution:  ''
+                                    }).addTo(map);
+
+                var railwayLayer = L.tileLayer('http://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
+                            attribution:  '©OpenRailwayMap'
+                                    }).addTo(map);
+
+                 for (let i = 0; i < jsonData.length; i++) {
+                    var marker = new L.Marker([jsonData[i].latitude, jsonData[i].longitude]);
+                    marker.bindPopup('Описание - ' + jsonData[i].description +
+                                     '<br>Адрес - '+jsonData[i].address +
+                                     '<br>Меры по ликвидации - ' + jsonData[i].taken_measures
+                    ).openPopup();
+                    marker.addTo(map);
+                 }
+           var featureGroup = L.featureGroup([railwayLayer, baseMap]);
+           featureGroup.addTo(map);
+           L.control.scale().addTo(map);
+    });
+
+
+</script>
